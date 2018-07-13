@@ -90,6 +90,8 @@
 #define BACKWARD    0
 #define LEFT        0
 #define RIGHT       1
+#define TRUE        1
+#define FALSE       0
 
 
 // Code /////////////////////////
@@ -310,8 +312,8 @@ void main(void) {
 #endif
 
 
-// Final Project
-#if 1
+// Final Project (Line-Following Meth.)
+#if 0
 #define ANCHL   ADC_CH2
 #define ANCHR   ADC_CH1
 int started = 0;
@@ -443,6 +445,56 @@ void main(void) {
     else { LATBbits.LATB4 = 0; }
 
   }     // endwhile
+
+}
+#endif
+
+
+// Final Project (Hard Program Meth.)
+#if 1
+int done = TRUE;
+
+void main(void) {
+  TRISA = 0b00000110;   // RA1, RA2 analog input
+  TRISB = 0b00000001;   // RB0 GO switch
+  TRISC = 0b00000000;
+
+  FORBAK = FORWARD;
+
+  OpenPWM2(0xff);
+  SetDCPWM2(0x000);
+
+  while (1) {
+
+    if (!GO) { done = FALSE; }
+
+    if (!done) {
+
+      POWFT = OFF;
+
+      SetDCPWM2(0x0ff); Delay1KTCYx(2 * 1e6);
+      SetDCPWM2(0x1ff); Delay1KTCYx(2 * 1e6);
+      SetDCPWM2(0x2ff); Delay1KTCYx(1 * 1e6);
+      SetDCPWM2(0x3ff); Delay1KTCYx(1 * 1e6);
+      Delay1KTCYx(4 * 1e6);
+
+      // DRIFT!
+      STEER = LEFT;
+      POWFT = ON;
+      Delay1KTCYx(4 * 1e5);
+      STEER = RIGHT;
+      Delay1KTCYx(1 * 1e5);
+      POWFT = OFF;
+
+      Delay1KTCYx(1 * 1e6);
+
+      SetDCPWM2(0x000);
+
+      done = TRUE;
+    
+    }   // endwhile
+
+  }
 
 }
 #endif
